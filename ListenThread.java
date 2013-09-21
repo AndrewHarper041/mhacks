@@ -3,23 +3,36 @@ import javax.mail.internet.*;
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 import java.util.Properties;
+import java.net.URI;
+import java.io.*;
+import javax.sound.sampled.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import com.darkprograms.speech.microphone.*;
 
 public class ListenThread extends Thread
 {
+	
+	public boolean running = false;
+	public static Microphone mic = new Microphone(AudioFileFormat.Type.WAVE);
+	public static File audioFile = new File("command.wav");	
 	
 	private static final String SMTP_HOST_NAME = "smtp.sendgrid.net";
     private static final String SMTP_AUTH_USER = "myusername";
     private static final String SMTP_AUTH_PWD  = "mypwd";
 	
-	ListenThread
-	{
-		
-	}
 	
 	public void run()
 	{
 		//Here be the voice recoginition 
-		
+		MicrophoneAnalyzer analyze = new MicrophoneAnalyzer(AudioFileFormat.Type.WAVE);
+		System.out.println(analyze.getVolumn());	
+		if(analyze.getVolumn() > 100)
+			mic.captureAudioToFile(audioFile);
+		if(analyze.getVolumn() < 100)
+			mic.close();
 		
 		
 		//When we get to voiceinput = String command;

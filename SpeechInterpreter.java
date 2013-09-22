@@ -1,9 +1,10 @@
-import java.io.File;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.FileInputStream;
-import java.io.StringWriter;
+import java.util.Properties;
+import java.net.URI;
+import java.io.*;
+import javax.sound.sampled.*;
+import java.awt.*;
+import java.awt.event.*;
+import com.darkprograms.speech.microphone.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -30,6 +31,72 @@ public class SpeechInterpreter {
 		
 	}
 	
+	public String handleText(String str)
+	{
+		str = "open facebook";
+		//Hard Coded functions
+		String[] tokens = str.split("\\s+");
+		String first = tokens[0];
+		first = first.trim();	
+		String search = "";
+		
+		for(int i=1 ; i < tokens.length; i++){
+			search = search.concat(tokens[i]);
+		}
+		
+			
+		System.out.println("First - " + first);
+		System.out.println("Search - " + search);
+		
+		//"Search/Lookup ___"
+		if(first.equals("search") || first.equals("lookup") || first.equals("google"))
+		{	
+			System.out.println("Searching . . . ");
+			try{
+			if(Desktop.isDesktopSupported())
+			{
+				Desktop.getDesktop().browse(new URI("https://www.google.com/search?q=" + search));
+				return "";
+			}}
+			catch(Exception e){System.out.println(e);}
+		}
+		
+		//"Goto/open ___"
+		if(first.equals("goto") || first.equals("open"))
+		{
+			System.out.println("Opening . . . ");
+			try{
+			if(Desktop.isDesktopSupported())
+			{
+				Desktop.getDesktop().browse(new URI("https://www." + search + ".com"));
+				return "";
+			}}
+			catch(Exception e){System.out.println(e);}
+		}
+		
+		//Everything Else
+		System.out.println("You: " + str);
+		Phrase phrase = new Phrase(str);
+		String response = "Umm...";
+		switch (phrase.type)
+		{
+		case NONSENSE:
+			response = "Huh?";
+			break;
+		case STATEMENT:
+			response = "Okay.";
+			break;
+		case YES_NO_QUESTION:
+			response = "Yes.";
+			break;
+		case DEFINITION_QUESTION:
+			System.out.println("q");
+			response = respondToDefinitionQuestion(phrase);
+			break;
+		}
+		return "Me: " + response;
+	}
+	
 	public void interpretText(File textFile)
 	{
 		BufferedReader reader = null;
@@ -48,7 +115,7 @@ public class SpeechInterpreter {
 		if (doc != null) System.out.println(getStringFromDocument(doc));
 	}
 	
-	public String respondToText(String text)
+	/*public String respondToText(String text)
 	{
 		System.out.println("You: " + text);
 		Phrase phrase = new Phrase(text);
@@ -65,11 +132,12 @@ public class SpeechInterpreter {
 			response = "Yes.";
 			break;
 		case DEFINITION_QUESTION:
+			System.out.println("q");
 			response = respondToDefinitionQuestion(phrase);
 			break;
 		}
 		return "Me: " + response;
-	}
+	}*/
 	
 	private String respondToDefinitionQuestion(Phrase phrase)
 	{	

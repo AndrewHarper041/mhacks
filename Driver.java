@@ -67,8 +67,15 @@ public class Driver
 		try
 		{
 			GoogleResponse response = recog.getRecognizedDataForWave(audioFile);
-			System.out.println(response.getResponse());
-			System.out.println(response.getAllPossibleResponses());
+			SpeechInterpreter interpreter = new SpeechInterpreter();
+			String answer = interpreter.handleText(response.getResponse());
+			System.out.println(answer);
+			if(answer.length > 1)
+			{
+				//TODO: text to speech here
+			}
+			//System.out.println(response.getResponse());
+			//System.out.println(response.getAllPossibleResponses());
 			
 		}catch(Exception e){System.out.println(e);}
 		System.out.println((System.currentTimeMillis() - start) / 1000.0);

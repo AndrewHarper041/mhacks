@@ -1,3 +1,5 @@
+
+
 import java.util.Properties;
 import java.net.URI;
 import java.io.*;
@@ -33,7 +35,7 @@ public class SpeechInterpreter {
 	
 	public String handleText(String str)
 	{
-		str = "open facebook";
+		//str = "where is the big house";
 		//Hard Coded functions
 		String[] tokens = str.split("\\s+");
 		String first = tokens[0];
@@ -74,6 +76,8 @@ public class SpeechInterpreter {
 			catch(Exception e){System.out.println(e);}
 		}
 		
+		//Weather Jaunt
+		
 		//Everything Else
 		System.out.println("You: " + str);
 		Phrase phrase = new Phrase(str);
@@ -90,11 +94,10 @@ public class SpeechInterpreter {
 			response = "Yes.";
 			break;
 		case DEFINITION_QUESTION:
-			System.out.println("q");
 			response = respondToDefinitionQuestion(phrase);
 			break;
 		}
-		return "Me: " + response;
+		return response;
 	}
 	
 	public void interpretText(File textFile)
@@ -156,6 +159,7 @@ public class SpeechInterpreter {
 			String[] sentences = doc.getElementsByTagName("text").item(0).getTextContent().split("\\.");
 			definition = sentences[0];
 
+			//System.out.println("this is crappy");
 		} catch (Exception e) {
 			System.out.println(e);
 			return definition;

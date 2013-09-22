@@ -1,3 +1,4 @@
+
 import java.net.URI;
 import java.io.*;
 import javax.sound.sampled.*;
@@ -42,18 +43,55 @@ public class Driver
 	
 	public static void main(String[] args)
 	{	
+	
 		long start = System.currentTimeMillis();
+		Console console = System.console();
 		try{mic.captureAudioToFile(audioFile);}catch(Exception e){System.out.println(e);}
 		MicrophoneAnalyzer analyze = new MicrophoneAnalyzer(AudioFileFormat.Type.WAVE);
+		String input;
+		Boolean run = true;
 		
-		while(((System.currentTimeMillis() - start) / 1000.0) < 5)
+		while(run)
 		{
-		
-			//System.out.println("Volume: " + mic.getAudioVolume());
-			//System.out.println(mic.getFrequency());
-		
-			//Human voice range is like 125-250
 			
+			input = console.readLine();
+						
+			if(input.equals("a"))
+			{
+			
+				mic.close();
+		
+				Recognizer recog = new Recognizer();
+						
+				try
+				{
+					GoogleResponse response = recog.getRecognizedDataForWave(audioFile);
+					SpeechInterpreter interpreter = new SpeechInterpreter();
+					String answer = interpreter.handleText(response.getResponse());
+					System.out.println(answer);
+					if(answer.length() > 1)
+					{
+						//TOTALLY LEGIT TEXT TO SPEECH IMPLEMENTAION MOVE ALONG NOTHING TO SEE HERE
+					
+						Runtime rt = Runtime.getRuntime();
+						try {
+							rt.exec(new String[]{"SayStatic.exe", answer});
+						} catch (Exception e) {System.out.println(e);}
+					}
+					//System.out.println(response.getResponse());
+					//System.out.println(response.getAllPossibleResponses());
+					
+				}catch(Exception e){System.out.println(e);}
+				
+			}
+			
+			if(input.equals("q"))
+			{
+				mic.close();
+				run = false;
+			}
+			input = "";
+			//try{mic.captureAudioToFile(audioFile);}catch(Exception e){System.out.println(e);}
 			
 		}
 		
@@ -62,7 +100,7 @@ public class Driver
 		mic.close();
 		
 		
-		Recognizer recog = new Recognizer();
+	/*	Recognizer recog = new Recognizer();
 				
 		try
 		{
@@ -70,14 +108,20 @@ public class Driver
 			SpeechInterpreter interpreter = new SpeechInterpreter();
 			String answer = interpreter.handleText(response.getResponse());
 			System.out.println(answer);
-			if(answer.length > 1)
+			if(answer.length() > 1)
 			{
-				//TODO: text to speech here
+				//TOTALLY LEGIT TEXT TO SPEECH IMPLEMENTAION MOVE ALONG NOTHING TO SEE HERE
+			
+				Runtime rt = Runtime.getRuntime();
+				try {
+					rt.exec(new String[]{"SayStatic.exe", answer});
+				} catch (Exception e) {System.out.println(e);}
 			}
 			//System.out.println(response.getResponse());
 			//System.out.println(response.getAllPossibleResponses());
 			
 		}catch(Exception e){System.out.println(e);}
-		System.out.println((System.currentTimeMillis() - start) / 1000.0);
+		System.out.println((System.currentTimeMillis() - start) / 1000.0); 
+		*/
 	}	
 }

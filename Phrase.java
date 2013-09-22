@@ -25,6 +25,9 @@ public class Phrase {
 	public final String string;
 	public final Type type;
 	public final String keyword;
+	//public final double sentiment;
+	
+	
 	
 	private static final String API_KEY = "f883996a525267c2bffcb1073f63d7474e42a827"; // API Key for AlchemyAPI
 	private static AlchemyAPI alchemyObj = AlchemyAPI.GetInstanceFromString(API_KEY);;
@@ -38,29 +41,38 @@ public class Phrase {
 	public Phrase(String string)
 	{
 		this.string = string;
-		this.type = getPhraseType();
 		this.keyword = getKeyword();
-		System.out.println("Keyword:" + keyword);
+		this.type = getPhraseType();
 	}
+	
+	/* THIS IS NOT DONE!
+	private double getSentiment()
+	{
+		try {getStringFromDocument(alchemyObj.TextGetTextSentiment(string));} catch (Exception e) {};
+	}
+	*/
 	
 	private Type getPhraseType()  
 	{
 		// Check if the user wants to know more about something
-		if (string.startsWith("what") || string.startsWith("where") || string.startsWith("who")) return Type.DEFINITION_QUESTION;
+		if (string.startsWith("what") || string.startsWith("where") || string.startsWith("who") || string.startsWith("why") || string.startsWith("how") ) return Type.DEFINITION_QUESTION;
 		// Check if the user wants to verify if something is true or false
 		if (string.startsWith("is") || string.startsWith("are") || string.startsWith("does") || string.startsWith("was") || string.startsWith("were")
-			||string.startsWith("do"))
+			||string.startsWith("do") || string.startsWith("am"))
 		{
 			try
 			{
-				Document doc = alchemyObj.TextGetRankedKeywords(string);
-				System.out.println(getStringFromDocument(doc));
+				return Type.YES_NO_QUESTION;
 			} catch (Exception e)
 			{
 				System.err.println(e);
+				return Type.NONSENSE;
 			}
 		}
-		return Type.STATEMENT;
+		// A statement is a non-question that contains at least one keyword
+		if (!keyword.isEmpty()) return Type.STATEMENT;
+		// If there are no keywords, the phrase is nonsense
+		return Type.NONSENSE;
 	}
 	
 	private String getKeyword()
@@ -68,10 +80,13 @@ public class Phrase {
 		try
 		{
 			Document doc = alchemyObj.TextGetRankedKeywords(string);
-			String[] line = doc.getElementsByTagName("keyword").item(0).getTextContent().trim().split("\n");
-			return line[0];
+			String[] words = doc.getElementsByTagName("keyword").item(0).getTextContent().trim().split("\n");
+			//System.out.println(getStringFromDocument(doc));
+			if (words[0].isEmpty()) return "";
+			return words[0];
 		} catch (Exception e) 
 		{
+			System.out.println("No keywords found.");
 			return "";
 		}
 	}

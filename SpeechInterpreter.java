@@ -1,23 +1,16 @@
 
 
-import java.util.Properties;
 import java.net.URI;
 import java.io.*;
-import javax.sound.sampled.*;
 import java.awt.*;
-import java.awt.event.*;
-import com.darkprograms.speech.microphone.*;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import com.alchemyapi.api.*;
 
@@ -33,8 +26,10 @@ public class SpeechInterpreter {
 		
 	}
 	
+	// This will return a response!
 	public String handleText(String str)
 	{
+		System.out.println("You: " + str);
 		//str = "where is the big house";
 		//Hard Coded functions
 		String[] tokens = str.split("\\s+");
@@ -58,7 +53,7 @@ public class SpeechInterpreter {
 			if(Desktop.isDesktopSupported())
 			{
 				Desktop.getDesktop().browse(new URI("https://www.google.com/search?q=" + search));
-				return "";
+				return "Here you go.";
 			}}
 			catch(Exception e){System.out.println(e);}
 		}
@@ -71,16 +66,20 @@ public class SpeechInterpreter {
 			if(Desktop.isDesktopSupported())
 			{
 				Desktop.getDesktop().browse(new URI("https://www." + search + ".com"));
-				return "";
+				return "I found this site for you.";
 			}}
 			catch(Exception e){System.out.println(e);}
 		}
 		
 		//Weather Jaunt
 		
+		
+		// Some hard-coded responses
+		if (str.contains("who are you") || str.contains("your name")) return "My name is Watson.";
+		if (str.contains("hello") || str.startsWith("hi") || str.contains("hey")) return "Hello.";
 		//Everything Else
-		System.out.println("You: " + str);
 		Phrase phrase = new Phrase(str);
+		System.out.println("Keyword: " + phrase.keyword);
 		String response = "Umm...";
 		switch (phrase.type)
 		{
@@ -88,10 +87,10 @@ public class SpeechInterpreter {
 			response = "Huh?";
 			break;
 		case STATEMENT:
-			response = "Okay.";
+			response = respondToStatement(phrase);
 			break;
 		case YES_NO_QUESTION:
-			response = "Yes.";
+			response = respondToYesNoQuestion(phrase);
 			break;
 		case DEFINITION_QUESTION:
 			response = respondToDefinitionQuestion(phrase);
@@ -142,12 +141,17 @@ public class SpeechInterpreter {
 		return "Me: " + response;
 	}*/
 	
+	// Regex: "  *" <- seperate by space
+	
 	private String respondToDefinitionQuestion(Phrase phrase)
 	{	
 		String definition = "I'm not sure.";
+		
+		// Search Wikipedia for answer
 		try {
 			// Format keyword for Wikipedia
 			String[] keywords = phrase.keyword.split("  *");
+			
 			StringBuilder formattedKeyword = new StringBuilder();
 			for (int i = 0; i < keywords.length; i++ )
 			{
@@ -170,7 +174,14 @@ public class SpeechInterpreter {
 	private String respondToYesNoQuestion(Phrase phrase)
 	{
 		String response = "I'm not sure.";
+		if (phrase.string.startsWith("is") || phrase.string.startsWith("are") || phrase.string.startsWith("am")) response = "Are you?";
 		return response; 
+	}
+	
+	private String respondToStatement(Phrase phrase)
+	{
+		String response = "Why are we talking about " + phrase.keyword + "?";
+		return response;
 	}
 
     // utility method

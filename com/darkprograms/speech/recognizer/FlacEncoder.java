@@ -42,6 +42,7 @@ public class FlacEncoder {
 
         try {
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputFile);
+            //AudioInputStream audioInputStream = AudioSystem.getAudioInputStream();
             AudioFormat format = audioInputStream.getFormat();
 
             int frameSize = format.getFrameSize();

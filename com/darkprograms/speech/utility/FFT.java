@@ -31,12 +31,12 @@ public class FFT {
     // compute the FFT of x[], assuming its length is a power of 2
     public static Complex[] fft(Complex[] x) {
         int N = x.length;
-
+		System.out.println(N);
         // base case
         if (N == 1) return new Complex[] { x[0] };
 
         // radix 2 Cooley-Tukey FFT
-        if (N % 2 != 0) { throw new RuntimeException("N is not a power of 2"); }
+        if (N % 2 != 0) {throw new RuntimeException("N is not a power of 2"); }
 
         // fft of even terms
         Complex[] even = new Complex[N/2];

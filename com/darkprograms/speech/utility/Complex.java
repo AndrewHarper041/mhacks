@@ -24,7 +24,9 @@ public class Complex {
     // create a new object with the given real and imaginary parts
     public Complex(double real, double imag) {
         re = real;
+		//System.out.println(re);
         im = imag;
+		//System.out.println(im);
     }
 
     // return a string representation of the invoking Complex object

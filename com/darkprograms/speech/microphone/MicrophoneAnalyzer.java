@@ -45,11 +45,30 @@ public class MicrophoneAnalyzer extends Microphone {
      * @return The volume over the specified number of bytes or -1 if data-line is unavailable.
      */
     private int calculateAudioVolume(int numOfBytes){
-		//System.out.println("byts: " + numOfBytes);
+		if(getTargetDataLine()!=null){
+    		byte[] data = new byte[numOfBytes];
+    		this.getTargetDataLine().read(data, 0, numOfBytes);
+    		return calculateRMSLevel(data);
+    	}
+		else{
+			return -1;
+		}
+		
+		/*System.out.println("byts: " + numOfBytes);
     	byte[] data = getBytes(numOfBytes);
     	if(data==null)
+		{
     		return -1;
-    	return calculateRMSLevel(data);
+		}
+		
+		System.out.println("data");
+		for(int i=0; i < data.length; i++)
+		{
+			System.out.println(data[i]);
+		}*/
+		
+		
+    	//return calculateRMSLevel(data);
     }
     
     /**
@@ -87,6 +106,9 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * @return the number of bytes the microphone will output over the specified time.
 	 */
 	public int getNumOfBytes(double seconds){
+		//System.out.println("AudioFormat: " + getAudioFormat());
+		//System.out.println("SampleRate: " + getAudioFormat().getSampleRate());
+		//System.out.println((int)(seconds*getAudioFormat().getSampleRate()*getAudioFormat().getFrameSize()+.5));
 		return (int)(seconds*getAudioFormat().getSampleRate()*getAudioFormat().getFrameSize()+.5);
 	}
 	
@@ -127,12 +149,17 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * @return The calculated frequency in Hertz.
 	 */
 	public int getFrequency(int numOfBytes) throws Exception{
-		if(getTargetDataLine() == null){
+		if(getTargetDataLine()!=null){
+    		byte[] data = new byte[numOfBytes+1];
+    		this.getTargetDataLine().read(data, 0, numOfBytes);
+			for(int i =0; i < data.length; i++)
+				System.out.println(data[i]);
+    		return getFrequency(data);
+    	}
+		else{
 			return -1;
 		}
-		byte[] data = new byte[numOfBytes+1];//One byte is lost during conversion
-    	this.getTargetDataLine().read(data, 0, numOfBytes);
-		return getFrequency(data);
+		
 	}
 	
 	/**
@@ -140,7 +167,8 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * @param bytes The audioData you want to analyze
 	 * @return The calculated frequency in Hertz.
 	 */
-	private int getFrequency(byte[] bytes){//This method requires an AudioFormat and cannot be static.
+	private int getFrequency(byte[] bytes)
+	{//This method requires an AudioFormat and cannot be static.
 		double[] audioData = this.bytesToDoubleArray(bytes);
 		Complex[] complex = new Complex[audioData.length];
 		for(int i = 0; i<complex.length; i++){
@@ -158,6 +186,7 @@ public class MicrophoneAnalyzer extends Microphone {
 	 * @return The frequency in Hertz
 	 */
 	private int calculateFundamentalFrequency(Complex[] fftData){
+		System.out.println(fftData);
 		int index = -1;
 		double max = Double.MIN_VALUE;
 		for(int i = 0; i<fftData.length/2; i++){
